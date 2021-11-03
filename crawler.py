@@ -25,13 +25,19 @@ def one_c_info(url):
 
     txt = i.get_text()
     txt = txt.strip()
-    if len(txt.split('\n')[-1])>30:
-      l = txt.split('\n')[0:-1]
-      #print((l))
-      txt = '\n'.join(l)
+
+    l = txt.split('\n')#[0:-1]
+    #print((l))
+    for i, j in enumerate(l):
+      d = 'Past SectionsPlease click the headings below to view the hidden section'
+      if d in j:
+        l.pop(i)
+
+    txt = '\n'.join(l)
+    
     with open('/content/drive/MyDrive/2140-IR/project/data/'+'course.txt','a+') as f:
       f.write(txt)  
-      f.write('\n-------------------\n',)
+      f.write('\n-------------------\n')  
 
 
 
