@@ -1,6 +1,7 @@
-#import Class.Path as Path
 import json
 import ast
+import gc
+
 
 index_Result="data/index_result//"
 #index_Result = ""
@@ -9,7 +10,7 @@ class MyIndexReader:
 
     def __init__(self):
         self.path = index_Result
-        print("finish reading the index")
+        #print("finish reading the index")
         self.post= -1
 
     # Return the integer DocumentID of input string DocumentNo.
@@ -76,3 +77,44 @@ class MyIndexReader:
     def getPostingList(self, token):
         post = self.post
         return post
+
+
+
+    def doc_len(self,doc_id):
+        file_path = './data/results.trectext'
+        with open(file_path,'r',encoding='latin-1') as f:
+            line = f.readline()
+            counts = 1
+            while line:
+                if counts == 2*doc_id-1:
+                    className = line
+                    describe = f.readline()
+                    break
+                line = f.readline()
+                counts += 1
+        class_T = []
+        for i in className.split(' '):
+            if i.isdigit():
+                continue
+            else:
+                class_T.append(i)
+
+
+        if describe == 'na \n':
+            return len(class_T)
+
+        else :
+            describe = describe.strip('\n')
+            describe = describe.strip().split(' ')
+            tot_len = len(class_T)+len(describe)
+
+
+        return tot_len
+
+
+        return
+
+    def total_term(self):
+        count = len(open(index_Result+'index', 'r').readlines())
+        gc.collect()
+        return count
