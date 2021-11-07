@@ -1,15 +1,15 @@
 import json
 import ast
 import gc
+import Classes.path as Path
 
 
-index_Result="data/index_result//"
-#index_Result = ""
+
 # Efficiency and memory cost should be paid with extra attention.
 class MyIndexReader:
 
     def __init__(self):
-        self.path = index_Result
+        self.path = Path.index_Result
         #print("finish reading the index")
         self.post= -1
 
@@ -115,6 +115,6 @@ class MyIndexReader:
         return
 
     def total_term(self):
-        count = len(open(index_Result+'index', 'r').readlines())
+        count = len(open(Path.index_Result+'index', 'r').readlines())
         gc.collect()
         return count

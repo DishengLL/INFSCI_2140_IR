@@ -34,9 +34,7 @@ def one_c_info(url):
     txt = '\n'.join(l)
     
     with open('/content/drive/MyDrive/2140-IR/project/data/'+'course.txt','a+') as f:
-      f.write(txt) 
-      f.write('\n') 
-      f.write(url)
+      f.write(txt)  
       f.write('\n-------------------\n')  
 
 
@@ -58,8 +56,8 @@ l_course = soup_course.find_all('a',href=not_lacie)
 d = defaultdict(dict)
 for i in l_course:
   field  = i.get_text().split()[0]
-  course_id = i.get_text().split()[1]
-  d[field][course_id] ='https://courses.sci.pitt.edu/'+i.get('href')
+  course_name = ' '.join(i.get_text().split()[1:len(i.get_text().split())])
+  d[field][course_name] ='https://courses.sci.pitt.edu/'+i.get('href')
 
 store_dict(d)
 

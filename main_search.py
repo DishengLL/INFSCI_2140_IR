@@ -13,9 +13,11 @@ s = input('input query: ')
 extractor = ExtractQuery.ExtractQuery(s)
 
 queries= extractor.getQuries()
+
 for query in queries:
-    ##print(query.topicId,"\t",query.queryContent)
+    #print(query.topicId,"\t",query.queryContent)
     results = search.retrieveQuery(query, 20)
+
     rank = 1
     for result in results:
         print(result.getDocNo(),' ',rank," ",result.getScore())

@@ -1,12 +1,12 @@
 
+import Classes.path as Path
 
-input = './data/results.trectext'
 
 class PreprocessedCorpusReader:
 
     def __init__(self):
 
-        self.f = open(input, 'r', encoding='latin-1')
+        self.f = open(Path.input, 'r', encoding='latin-1')
         return
 
     # Read a line for docNo from the corpus, read another line for the content, and return them in [docNo, content].

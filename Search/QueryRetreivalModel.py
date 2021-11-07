@@ -25,31 +25,48 @@ class QueryRetrievalModel:
     # You will find our IndexingLucene.Myindexreader provides method: docLength().
     # Returned documents should be a list of Document.
     def retrieveQuery(self, query, topN):
-        res = []
-        Q = query.getQueryContent()
-        mu =2000
-        d = defaultdict(lambda: 1)
-        for token in Q:
-            # Dirichlet = [count(w,D)+ mu*p(w|C)] / [len(D)+mu]
-            cf = self.indexReader.CollectionFreq(token)
+        doc_freq = defaultdict(list)
+        query = query.getQueryContent()
+        total_words = self.indexReader.total_term()
 
-            if cf>0: # the token exist in the collection.
-                posting = self.indexReader.getPostingList1(token)
+        for i in range(len(query)):
+            cur_q = query[i]
+            docs = self.indexReader.getPostingList1(cur_q)
+            if not docs:
+                continue
 
-                for j  in posting:
-                    s = (posting[j] + mu * (cf /self.num_terms))/(self.indexReader.doc_len(j)+mu)
-                    #print(j,'word count',posting[j],'cf',cf,'doc_len:',self.indexReader.getDocLength(j))
-                    d[j] = d[j]*s
+            for docId, fre in docs.items():
+                if docId not in doc_freq:
+                    doc_freq[docId] = [0] * len(query)
 
-        sorted_dict = sorted(d.items(), key = lambda item: item[1], reverse = True)
+                doc_freq[docId][i] = fre
 
-        for i in range (min(topN,len(sorted_dict))):
-            D = Document()
-            D.setDocId(sorted_dict[i][0])
-            D.setDocNo(self.indexReader.getDocNo(sorted_dict[i][0]))
-            D.setScore(sorted_dict[i][1])
+        for i in range(len(query)):
+            cur_q = query[i]
+            docs = self.indexReader.getPostingList(cur_q)
 
-            res.append(D)
+            if not docs:
+                continue
 
+            collection_freq = self.indexReader.CollectionFreq(cur_q)
+            for key in doc_freq.keys():
+                doc_freq[key][i] += 2000 * collection_freq / total_words
+                doc_freq[key][i] /= (self.indexReader.doc_len(key) + 2000)
 
-        return res
+        ranked_doc = defaultdict(float)
+        for docId, q_list in doc_freq.items():
+            prob = 1.0
+            for q in q_list:
+                prob *= q
+
+            ranked_doc[docId] = prob
+
+        Top_ranked = sorted(ranked_doc.items(), key=lambda a: a[1], reverse=True)
+        documents = []
+        for item in Top_ranked[:topN]:
+            result_doc = Document()
+            result_doc.setDocNo(self.indexReader.getDocNo(int(item[0])))
+            result_doc.setScore(item[1])
+            documents.append(result_doc)
+
+        return documents
